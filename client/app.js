@@ -71,27 +71,6 @@ function displayTasks() {
 }
 
 
-/*async function taskCompleted(btnComleteElement) {
-  let id = btnComleteElement.parentNode.parentNode.getAttribute('data-task-id');
-
-  let response = await fetch(`http://localhost:3000/tasks/${id}`, {
-    method: 'PATCH',
-    headers: {
-      'Content-Type': 'application/json'
-    }
-  });
-
-  if (response.ok) {
-    let updatedTask = await response.json();
-    let task = tasks.find(task => Number(task.id).toString() === id);
-    if (task) {
-      task.done = true;
-    }
-    displayTasks();
-  } else {
-    console.error(`Error: ${response.statusText}`);
-  }
-}*/
 async function taskCompleted(btnComleteElement){
   let id = btnComleteElement.parentNode.parentNode.getAttribute('data-task-id');
   let response = await fetch(`http://localhost:3000/tasks/${id}`, {

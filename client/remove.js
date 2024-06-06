@@ -1,4 +1,4 @@
-function deleteTask(btnDeleteElement){
+/*function deleteTask(btnDeleteElement){
     let id = btnDeleteElement.parentNode.parentNode.getAttribute('data-task-id');
     let index = parseInt(id);
 
@@ -7,8 +7,14 @@ function deleteTask(btnDeleteElement){
       tasks.splice (index,1)
       displayTasks()
     }
-}        
+}  */      
 
-//     tasks.splice(idn,1);
-//     displayTasks();
-//   }
+
+async function deleteTask(btnDeleteElement){
+  let id = btnDeleteElement.parentNode.parentNode.getAttribute('data-task-id');
+  let response = await fetch(`http://localhost:3000/tasks/${id}`, {
+    method: 'DELETE'
+  })
+  tasks = await response.json();
+  displayTasks();
+}

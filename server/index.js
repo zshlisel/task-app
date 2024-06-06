@@ -26,7 +26,7 @@ async function testConnection() {
   
   testConnection();
 
-/*const app = express()
+const app = express()
 app.use(cors())
 app.use(express.json())
 
@@ -67,8 +67,20 @@ app.patch('/tasks/:id', (req, res) => {
     res.json(tasks);
 })
 
+app.delete('/tasks/:id', (req, res) => {
+    console.log('tasks', tasks)
+    /*let task = tasks.find((task) => Number(task.id).toString() === req.params.id)
+    if (task) {
+        tasks.splice(task,1);
+    }*/
+    let index = tasks.findIndex(task => Number(task.id) === Number(req.params.id));
+    if (index !== -1) {
+        tasks.splice(index, 1);
+    }
+    res.json(tasks);
+})
+
 // Start the server
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
 });
-*/
