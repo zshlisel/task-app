@@ -15,72 +15,54 @@ const db = pgp({
     ssl: true
 })
 
-async function testConnection() {
-    try {
-      const result = await db.many('SELECT * from users');
-      console.log('Connected to the PostgreSQL database:', result);
-    } catch (err) {
-      console.error('Error connecting to the PostgreSQL database:', err);
-    }
-  }
-  
-  testConnection();
 
 const app = express()
 app.use(cors())
 app.use(express.json())
-
 const port = 3000;
 
-const tasks = [{
-    id : 1,
-    title : 'Register on VP',
-    done : true
-}, {
-    id : 2,
-    title : 'earn React.js',
-    done : false
-}, {
-    id : 3,
-    title : 'Learn Express.js',
-    done : false
-}]
+const tasks = [];
 
 
-// Define a simple route
-app.get('/tasks', (req, res) => {
-    res.json(tasks);
+// get tasks
+app.get('/tasks', async (req, res) => {
+    const result = await db.many('select * from task where deleted_at is null');
+    res.json(result.map(task => ({ id: task.id, title: task.title, done: task.status !== 'active'})))
 });
 
-app.post('/tasks', (req, res) => {
-    tasks.push(req.body)
-    res.json(tasks)
+// post new task
+app.post('/tasks', async (req, res) => {
+    const result = await db.one('insert into task (title, user_id) values (${title}, ${user_id}) returning *', {
+        title: req.body.title,
+        user_id:1 
+    })
+    console.log('result', result)
+    res.json({
+        title: result.title,
+        done: false,
+        id: result.id
+    })
 })
 
-app.patch('/tasks/:id', (req, res) => {
+// update completed task
+app.patch('/tasks/:id', async (req, res) => {
     console.log('tasks', tasks)
     console.log(':id param', req.params.id)
-    let task = tasks.find((task) => Number(task.id).toString() === req.params.id)
-    if (task) {
-        task.done = true;
-    }
-    res.json(tasks);
+    const result = await db.none("update task set status = 'done' where id = ${id}", {
+        id: req.params.id
+    })
+    res.json({ok: true});
 })
 
-app.delete('/tasks/:id', (req, res) => {
-    console.log('tasks', tasks)
-    /*let task = tasks.find((task) => Number(task.id).toString() === req.params.id)
-    if (task) {
-        tasks.splice(task,1);
-    }*/
-    let index = tasks.findIndex(task => Number(task.id) === Number(req.params.id));
-    if (index !== -1) {
-        tasks.splice(index, 1);
-    }
-    res.json(tasks);
+// mark task as deleted
+app.delete('/tasks/:id', async (req, res) => {
+    await db.none("update task set deleted_at = now() where id = ${id}", {
+        id: req.params.id
+    })
+    res.json({ok: true})
 })
 
-// Start the server
+// starting server
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
 });

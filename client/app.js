@@ -15,15 +15,11 @@ async function addTaskBtnClicked() {
   let newTaskValue = inputElement.value;
   if (!newTaskValue) return;
 
-  function generateRandomInteger(min, max) {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-  }
 
   let newTaskObject = {
-    id : generateRandomInteger(1,10000),
+    
     title: newTaskValue,
-    done : false,
-    userName: window.userName
+    done : false
   };
 
   // Send the new task to the server
@@ -36,8 +32,9 @@ async function addTaskBtnClicked() {
   });
 
   if (response.ok) {
-    tasks = await response.json();
-    console.log(tasks);
+    let newTask = await response.json();
+    console.log(newTask);
+    tasks.push(newTask)
  
 
   inputElement.value = null;
@@ -76,8 +73,7 @@ async function taskCompleted(btnComleteElement){
   let response = await fetch(`http://localhost:3000/tasks/${id}`, {
     method: 'PATCH'
   })
-  /*tasks.find((task) => Number(task.id).toString() === id).done = true;*/
-  tasks = await response.json();
+  tasks.find((task) => Number(task.id).toString() === id).done = true;
   displayTasks();
 }
 
