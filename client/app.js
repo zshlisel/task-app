@@ -3,9 +3,10 @@ let tasks = [];
 async function main() {
   let response = await fetch('http://localhost:3000/tasks')
   tasks = await response.json();
-  console.log(tasks)
+  console.log(tasks);
+  displayTasks();
 }
-main()
+
 
 
 

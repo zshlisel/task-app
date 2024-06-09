@@ -7,7 +7,7 @@ import 'dotenv/config';
 
 const pgp = pgPromise();
 const db = pgp({
-    host: 'ep-rapid-wind-a6weniwm.us-west-2.retooldb.com',
+    host: 'ep-soft-resonance-a6dcqwl4.us-west-2.retooldb.com',
     port: 5432,
     database: 'retool',
     user: 'retool',
@@ -34,7 +34,7 @@ app.get('/tasks', async (req, res) => {
 app.post('/tasks', async (req, res) => {
     const result = await db.one('insert into task (title, user_id) values (${title}, ${user_id}) returning *', {
         title: req.body.title,
-        user_id:1 
+        user_id:3
     })
     console.log('result', result)
     res.json({
@@ -60,6 +60,35 @@ app.delete('/tasks/:id', async (req, res) => {
         id: req.params.id
     })
     res.json({ok: true})
+})
+
+//check login
+/*app.post('/login', async (req, res) => {
+    const result = await db.one('insert into task (title, user_id) values (${title}, ${user_id}) returning *', {
+        title: req.body.title,
+        user_id:1 
+    })
+    console.log('result', result)
+    res.json({
+        title: result.title,
+        done: false,
+        id: result.id
+    })
+})*/
+
+//post new user
+app.post('/user', async (req, res) => {
+    const result = await db.one('insert into person (name,email, pass) values (${name},${email}, ${pass}) returning *', {
+        name: req.body.name,
+        pass: req.body.pass,
+        email : req.body.email
+    })
+    console.log('result', result)
+    res.json({
+        name: result.name,
+        email: result.email,
+        id: result.id
+    })
 })
 
 // starting server

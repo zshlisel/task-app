@@ -1,5 +1,5 @@
 const TITLE = 'Welcome to our ToDo App!!!';
-
+let loggedInUser = {};
 
 function loginBtnClicked() {
   let inputEl = document.querySelector("#user-name-input");
@@ -16,15 +16,54 @@ function loginBtnClicked() {
   
 }
 
+async function signUpBtnClicked(){
+    let inputname = document.querySelector("#new-user-name-input");
+    let newUserValue = inputname.value;
+    let inputpass = document.querySelector("#new-password-input");
+    let newPassValue = inputpass.value;
+    let inputEmail = document.querySelector("#email-input");
+    let newEmailValue = inputEmail.value;
+    if (!newUserValue) return;
+    if (!newPassValue) return;
+
+  
+    let newUserObject = {
+      
+      name : newUserValue,
+      pass : newPassValue,
+      email : newEmailValue
+    };
+  
+    // Send the new user to the server
+    const response = await fetch('http://localhost:3000/user', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(newUserObject)
+    });
+  
+    if (response.ok) {
+      loggedInUser = await response.json();
+      console.log(loggedInUser);
+      
+    
+    displayApp()
+    } else {
+      console.error('failed to add user');
+    }
+  
+}
+
 function displayApp() {
   let container = document.querySelector(".todo-container");
   container.style.display = "block";
 
-  let welcomeCtr = document.querySelector(".login");
+  let welcomeCtr = document.querySelector(".getUser");
   welcomeCtr.style.display = "none";
 
   displayTitle();
-  displayTasks();
+  main();
 }
 
 function displayTitleTillIndex(index){
@@ -55,4 +94,20 @@ function togglePassword() {
       passwordInput.type = 'password';
       toggleButton.textContent = 'Show';
   }
+}
+
+function switchToSignUp() {
+  let signUp = document.querySelector(".signup");
+  signUp.style.display = "block";
+
+  let login = document.querySelector(".login");
+  login.style.display = "none";
+}
+
+function switchToLogin() {
+  let login = document.querySelector(".login");
+  login.style.display = "block";
+
+  let signUp = document.querySelector(".signup");
+  signUp.style.display = "none"; 
 }
