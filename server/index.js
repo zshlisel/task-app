@@ -26,15 +26,27 @@ const tasks = [];
 
 // get tasks
 app.get('/tasks', async (req, res) => {
-    const result = await db.many('select * from task where deleted_at is null');
+    const userId = req.headers['authorization']
+    if (!userId){
+        return res.status(401).json({error: 'Unauthorized'});
+    }
+    const result = await db.manyOrNone('select * from task where deleted_at is null and user_id = ${userId}',{userId});
+    if (result.length === 0){
+        return res.status(200).json([]);
+    }
     res.json(result.map(task => ({ id: task.id, title: task.title, done: task.status !== 'active'})))
 });
 
+
 // post new task
 app.post('/tasks', async (req, res) => {
-    const result = await db.one('insert into task (title, user_id) values (${title}, ${user_id}) returning *', {
+    const userId = req.headers['authorization']
+    if (!userId){
+        return res.status(401).json({error: 'Unauthorized'});
+    }
+    const result = await db.one('insert into task (title, user_id) values (${title}, ${userId}) returning *', {
         title: req.body.title,
-        user_id:3
+        userId
     })
     console.log('result', result)
     res.json({
@@ -44,50 +56,45 @@ app.post('/tasks', async (req, res) => {
     })
 })
 
+
 // update completed task
 app.patch('/tasks/:id', async (req, res) => {
+    const userId = req.headers['authorization']
+    if (!userId){
+        return res.status(401).json({error: 'Unauthorized'});
+    }
     console.log('tasks', tasks)
     console.log(':id param', req.params.id)
-    const result = await db.none("update task set status = 'done' where id = ${id}", {
-        id: req.params.id
+    const result = await db.none("update task set status = 'done' where user_id = ${userId} and id = ${id}", {
+        id: req.params.id,
+        userId
     })
     res.json({ok: true});
 })
 
+
 // mark task as deleted
 app.delete('/tasks/:id', async (req, res) => {
-    await db.none("update task set deleted_at = now() where id = ${id}", {
-        id: req.params.id
+    const userId = req.headers['authorization']
+    await db.none("update task set deleted_at = now() where user_id = ${userId} and id = ${id}", {
+        id: req.params.id,
+        userId
     })
     res.json({ok: true})
 })
 
-//check login
-/*app.post('/login', async (req, res) => {
-    const result = await db.one('insert into task (title, user_id) values (${title}, ${user_id}) returning *', {
-        title: req.body.title,
-        user_id:1 
-    })
-    console.log('result', result)
-    res.json({
-        title: result.title,
-        done: false,
-        id: result.id
-    })
-})*/
+
+//user login
 app.post('/login', async (req, res) => {
     const { username, password } = req.body;
-    try {
-        const user = await db.oneOrNone('SELECT * FROM person WHERE name = ${username}', { username });
-        if (user && user.pass === password) {
-            res.json({ ok: true });
-        } else {
-            res.json({ ok: false });
-        }
-    } catch (error) {
-        console.error('Error during login:', error);
-        res.status(500).send('Error during login');
+
+    const user = await db.oneOrNone('SELECT * FROM person WHERE name = ${username}', { username });
+    if (user && user.pass === password) {
+        res.json({ ok: true, userId: user.id });
+    } else {
+        res.json({ ok: false });
     }
+
 });
 
 //post new user
@@ -101,7 +108,7 @@ app.post('/user', async (req, res) => {
     res.json({
         name: result.name,
         email: result.email,
-        id: result.id
+        userId: result.id
     })
 })
 

@@ -1,10 +1,19 @@
 let tasks = [];
 
 async function main() {
-  let response = await fetch('http://localhost:3000/tasks')
-  tasks = await response.json();
-  console.log(tasks);
-  displayTasks();
+  const userId = sessionStorage.getItem('userId')
+  let response = await fetch('http://localhost:3000/tasks', {
+    headers: {
+      'authorization': userId
+    }
+  });
+  if (response.ok) {
+    tasks = await response.json();
+    console.log(tasks);
+    displayTasks();
+  } else {
+    console.error('Failed to get tasks');
+  }
 }
 
 
@@ -18,16 +27,18 @@ async function addTaskBtnClicked() {
 
 
   let newTaskObject = {
-    
+
     title: newTaskValue,
-    done : false
+    done: false
   };
 
   // Send the new task to the server
+  const userId = sessionStorage.getItem('userId')
   const response = await fetch('http://localhost:3000/tasks', {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
+      'authorization': userId
     },
     body: JSON.stringify(newTaskObject)
   });
@@ -36,11 +47,11 @@ async function addTaskBtnClicked() {
     let newTask = await response.json();
     console.log(newTask);
     tasks.push(newTask)
- 
 
-  inputElement.value = null;
-  //display the task in the document
-  displayTasks();
+
+    inputElement.value = null;
+    //display the task in the document
+    displayTasks();
   } else {
     console.error('failed to add task');
   }
@@ -49,30 +60,34 @@ async function addTaskBtnClicked() {
 
 
 function displayTasks() {
-    
+
   let todoSectionElement = document.querySelector("#todo-list");
   todoSectionElement.innerHTML = `<h2 class="task-header">To Do - <span></span></h2>`;
 
   let doneSectionElement = document.querySelector('#done-list');
   doneSectionElement.innerHTML = `<h2 class="task-header">Done - <span></span></h2>`;
 
-  for (let i = 0; i < tasks.length; i++){
+  for (let i = 0; i < tasks.length; i++) {
     let task = tasks[i];
 
     let taskElement = buildTaskElement(task);
-    if(task.done){
-        doneSectionElement.appendChild(taskElement);
+    if (task.done) {
+      doneSectionElement.appendChild(taskElement);
     } else {
-        todoSectionElement.appendChild(taskElement);
+      todoSectionElement.appendChild(taskElement);
     }
   }
 }
 
 
-async function taskCompleted(btnComleteElement){
+async function taskCompleted(btnComleteElement) {
+  const userId = sessionStorage.getItem('userId')
   let id = btnComleteElement.parentNode.parentNode.getAttribute('data-task-id');
   let response = await fetch(`http://localhost:3000/tasks/${id}`, {
-    method: 'PATCH'
+    method: 'PATCH',
+    headers: {
+      'authorization': userId
+    }
   })
   tasks.find((task) => Number(task.id).toString() === id).done = true;
   displayTasks();
