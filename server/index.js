@@ -75,6 +75,20 @@ app.delete('/tasks/:id', async (req, res) => {
         id: result.id
     })
 })*/
+app.post('/login', async (req, res) => {
+    const { username, password } = req.body;
+    try {
+        const user = await db.oneOrNone('SELECT * FROM person WHERE name = ${username}', { username });
+        if (user && user.pass === password) {
+            res.json({ ok: true });
+        } else {
+            res.json({ ok: false });
+        }
+    } catch (error) {
+        console.error('Error during login:', error);
+        res.status(500).send('Error during login');
+    }
+});
 
 //post new user
 app.post('/user', async (req, res) => {

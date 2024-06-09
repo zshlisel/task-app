@@ -1,20 +1,43 @@
 const TITLE = 'Welcome to our ToDo App!!!';
 let loggedInUser = {};
 
-function loginBtnClicked() {
-  let inputEl = document.querySelector("#user-name-input");
-  let userName = inputEl.value;
-  window.userName = userName;
+async function loginBtnClicked() {
+  let inputname = document.querySelector("#user-name-input");
+  let username = inputname.value;
+  let inputpass = document.querySelector("#password-input");
+  let password = inputpass.value;
+  if (!username || !password) return;
+
+  let loginObject = {
+      username: username,
+      password: password
+  };
+
+  const response = await fetch('http://localhost:3000/login', {
+      method: 'POST',
+      headers: {
+          'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(loginObject)
+  });
+
+  const result = await response.json();
+  if (result.ok) {
+      console.log('Login successful');
+      setTimeout(displayApp, 1000);
+      let loginBtn = document.querySelector('#login-btn');
+      loginBtn.innerText = 'Logging In...';
+  } else {
+      console.error('Login failed');
+  }
+}
+ 
 
 
-  setTimeout(displayApp, 1000);
 
-  let loginBtn = document.querySelector('#login-btn');
-
-  loginBtn.innerText = 'Logging In...';
 
   
-}
+
 
 async function signUpBtnClicked(){
     let inputname = document.querySelector("#new-user-name-input");
