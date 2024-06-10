@@ -1,14 +1,23 @@
-function deleteTask(btnDeleteElement){
-    let id = btnDeleteElement.parentNode.parentNode.getAttribute('data-task-id');
-    let index = parseInt(id);
+async function deleteTask(btnDeleteElement) {
+  const userId = sessionStorage.getItem('userId')
+  let id = btnDeleteElement.parentNode.parentNode.getAttribute('data-task-id');
+  let confirmToDelete = confirm("Are you sure you want to delete?")
+  if (confirmToDelete == true) {
+    let response = await fetch(`http://localhost:3000/tasks/${id}`, {
+      method: 'DELETE',
+      headers:{
+        'authorization': userId
+      }
+    });
 
-    let confirmToDelete = confirm("Are you sure you want to delete?")
-    if (confirmToDelete == true) {
-      tasks.splice (index,1)
-      displayTasks()
+    if (response.ok) {
+      const index = tasks.findIndex((task) => task.id == id);
+      if (index !== -1) {
+        tasks.splice(index, 1);
+        displayTasks();
+      }
+    } else {
+      console.error('Failed to delete task');
     }
-}        
-
-//     tasks.splice(idn,1);
-//     displayTasks();
-//   }
+  }
+}

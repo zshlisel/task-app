@@ -10,14 +10,35 @@
     <script src="./remove.js"></script>
   </head>
   <body>
-    <div class="login">
-      <input
-        id="user-name-input"
-        type="text"
-        placeholder="Please Enter Your user name"
-      />
-      <button id="login-btn" onclick="loginBtnClicked()">Login</button>
+    <div class="getUser">
+      <div class="login">
+        <input id="user-name-input" type="text" placeholder="Please Enter Your user name" />
+        <div class="password-container">
+          <input id="password-input" type="password" placeholder="Please Enter Your Password" />
+          <button id="toggle-password" type="button" onclick="togglePassword()">Show</button>
+        </div>
+        <button id="login-btn" onclick="loginBtnClicked()">Login</button>
+        <button id="to-signUp" onclick="switchToSignUp()">New? Sign Up!</button>
+      </div>
+    
+      <div class="signup" style="display: none">
+        <input id="new-user-name-input" type="text" placeholder="Please create a user name" />
+        <input id="email-input" type="email" placeholder="Please Enter Your email" />
+        <div class="password-container">
+          <input id="new-password-input" type="password" placeholder="Please Enter Your Password" />
+          <button id="toggle-password" type="button" onclick="togglePassword()">Show</button>
+        </div>
+        <div class="password-container">
+          <input id="new-password-input2" type="password" placeholder="Please Re-Enter Your Password" />
+          <button id="toggle-password" type="button" onclick="togglePassword()">Show</button>
+        </div>
+        <button id="signUp-btn" onclick="signUpBtnClicked()">Register</button>
+        <button id="to-login" onclick="switchToLogin()">Have An Account? Login Here!</button>
+    
+      </div>
     </div>
+  
+
     <div class="todo-container" style="display: none">
       <h1 id="app-title"></h1>
       <div class="input-container">

@@ -1,11 +1,21 @@
 let tasks = [];
 
 async function main() {
-  let response = await fetch('http://localhost:3000/tasks')
-  tasks = await response.json();
-  console.log(tasks)
+  const userId = sessionStorage.getItem('userId')
+  let response = await fetch('http://localhost:3000/tasks', {
+    headers: {
+      'authorization': userId
+    }
+  });
+  if (response.ok) {
+    tasks = await response.json();
+    console.log(tasks);
+    displayTasks();
+  } else {
+    console.error('Failed to get tasks');
+  }
 }
-main()
+
 
 
 
@@ -15,34 +25,33 @@ async function addTaskBtnClicked() {
   let newTaskValue = inputElement.value;
   if (!newTaskValue) return;
 
-  function generateRandomInteger(min, max) {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-  }
 
   let newTaskObject = {
-    id : generateRandomInteger(1,10000),
+
     title: newTaskValue,
-    done : false,
-    userName: window.userName
+    done: false
   };
 
   // Send the new task to the server
+  const userId = sessionStorage.getItem('userId')
   const response = await fetch('http://localhost:3000/tasks', {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
+      'authorization': userId
     },
     body: JSON.stringify(newTaskObject)
   });
 
   if (response.ok) {
-    tasks = await response.json();
-    console.log(tasks);
- 
+    let newTask = await response.json();
+    console.log(newTask);
+    tasks.push(newTask)
 
-  inputElement.value = null;
-  //display the task in the document
-  displayTasks();
+
+    inputElement.value = null;
+    //display the task in the document
+    displayTasks();
   } else {
     console.error('failed to add task');
   }
@@ -51,54 +60,36 @@ async function addTaskBtnClicked() {
 
 
 function displayTasks() {
-    
+
   let todoSectionElement = document.querySelector("#todo-list");
   todoSectionElement.innerHTML = `<h2 class="task-header">To Do - <span></span></h2>`;
 
   let doneSectionElement = document.querySelector('#done-list');
   doneSectionElement.innerHTML = `<h2 class="task-header">Done - <span></span></h2>`;
 
-  for (let i = 0; i < tasks.length; i++){
+  for (let i = 0; i < tasks.length; i++) {
     let task = tasks[i];
 
     let taskElement = buildTaskElement(task);
-    if(task.done){
-        doneSectionElement.appendChild(taskElement);
+    if (task.done) {
+      doneSectionElement.appendChild(taskElement);
     } else {
-        todoSectionElement.appendChild(taskElement);
+      todoSectionElement.appendChild(taskElement);
     }
   }
 }
 
 
-/*async function taskCompleted(btnComleteElement) {
+async function taskCompleted(btnComleteElement) {
+  const userId = sessionStorage.getItem('userId')
   let id = btnComleteElement.parentNode.parentNode.getAttribute('data-task-id');
-
   let response = await fetch(`http://localhost:3000/tasks/${id}`, {
     method: 'PATCH',
     headers: {
-      'Content-Type': 'application/json'
+      'authorization': userId
     }
-  });
-
-  if (response.ok) {
-    let updatedTask = await response.json();
-    let task = tasks.find(task => Number(task.id).toString() === id);
-    if (task) {
-      task.done = true;
-    }
-    displayTasks();
-  } else {
-    console.error(`Error: ${response.statusText}`);
-  }
-}*/
-async function taskCompleted(btnComleteElement){
-  let id = btnComleteElement.parentNode.parentNode.getAttribute('data-task-id');
-  let response = await fetch(`http://localhost:3000/tasks/${id}`, {
-    method: 'PATCH'
   })
-  /*tasks.find((task) => Number(task.id).toString() === id).done = true;*/
-  tasks = await response.json();
+  tasks.find((task) => Number(task.id).toString() === id).done = true;
   displayTasks();
 }
 

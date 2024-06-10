@@ -7,7 +7,7 @@ import 'dotenv/config';
 
 const pgp = pgPromise();
 const db = pgp({
-    host: 'ep-rapid-wind-a6weniwm.us-west-2.retooldb.com',
+    host: 'ep-soft-resonance-a6dcqwl4.us-west-2.retooldb.com',
     port: 5432,
     database: 'retool',
     user: 'retool',
@@ -15,60 +15,104 @@ const db = pgp({
     ssl: true
 })
 
-async function testConnection() {
-    try {
-      const result = await db.many('SELECT * from users');
-      console.log('Connected to the PostgreSQL database:', result);
-    } catch (err) {
-      console.error('Error connecting to the PostgreSQL database:', err);
-    }
-  }
-  
-  testConnection();
 
-/*const app = express()
+const app = express()
 app.use(cors())
 app.use(express.json())
-
 const port = 3000;
 
-const tasks = [{
-    id : 1,
-    title : 'Register on VP',
-    done : true
-}, {
-    id : 2,
-    title : 'earn React.js',
-    done : false
-}, {
-    id : 3,
-    title : 'Learn Express.js',
-    done : false
-}]
+const tasks = [];
 
 
-// Define a simple route
-app.get('/tasks', (req, res) => {
-    res.json(tasks);
+// get tasks
+app.get('/tasks', async (req, res) => {
+    const userId = req.headers['authorization']
+    if (!userId){
+        return res.status(401).json({error: 'Unauthorized'});
+    }
+    const result = await db.manyOrNone('select * from task where deleted_at is null and user_id = ${userId}',{userId});
+    if (result.length === 0){
+        return res.status(200).json([]);
+    }
+    res.json(result.map(task => ({ id: task.id, title: task.title, done: task.status !== 'active'})))
 });
 
-app.post('/tasks', (req, res) => {
-    tasks.push(req.body)
-    res.json(tasks)
+
+// post new task
+app.post('/tasks', async (req, res) => {
+    const userId = req.headers['authorization']
+    if (!userId){
+        return res.status(401).json({error: 'Unauthorized'});
+    }
+    const result = await db.one('insert into task (title, user_id) values (${title}, ${userId}) returning *', {
+        title: req.body.title,
+        userId
+    })
+    console.log('result', result)
+    res.json({
+        title: result.title,
+        done: false,
+        id: result.id
+    })
 })
 
-app.patch('/tasks/:id', (req, res) => {
+
+// update completed task
+app.patch('/tasks/:id', async (req, res) => {
+    const userId = req.headers['authorization']
+    if (!userId){
+        return res.status(401).json({error: 'Unauthorized'});
+    }
     console.log('tasks', tasks)
     console.log(':id param', req.params.id)
-    let task = tasks.find((task) => Number(task.id).toString() === req.params.id)
-    if (task) {
-        task.done = true;
-    }
-    res.json(tasks);
+    const result = await db.none("update task set status = 'done' where user_id = ${userId} and id = ${id}", {
+        id: req.params.id,
+        userId
+    })
+    res.json({ok: true});
 })
 
-// Start the server
+
+// mark task as deleted
+app.delete('/tasks/:id', async (req, res) => {
+    const userId = req.headers['authorization']
+    await db.none("update task set deleted_at = now() where user_id = ${userId} and id = ${id}", {
+        id: req.params.id,
+        userId
+    })
+    res.json({ok: true})
+})
+
+
+//user login
+app.post('/login', async (req, res) => {
+    const { username, password } = req.body;
+
+    const user = await db.oneOrNone('SELECT * FROM person WHERE name = ${username}', { username });
+    if (user && user.pass === password) {
+        res.json({ ok: true, userId: user.id });
+    } else {
+        res.json({ ok: false });
+    }
+
+});
+
+//post new user
+app.post('/user', async (req, res) => {
+    const result = await db.one('insert into person (name,email, pass) values (${name},${email}, ${pass}) returning *', {
+        name: req.body.name,
+        pass: req.body.pass,
+        email : req.body.email
+    })
+    console.log('result', result)
+    res.json({
+        name: result.name,
+        email: result.email,
+        userId: result.id
+    })
+})
+
+// starting server
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
 });
-*/

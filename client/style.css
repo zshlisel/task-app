@@ -102,4 +102,73 @@ body {
   .completed .task p {
     text-decoration: line-through;
   }
-  
+
+  .login {
+    display: flex;
+    flex-direction: column;
+    width: 300px; /* Adjust width as needed */
+    margin: 0 auto; /* Center the form horizontally */
+}
+
+.login input,
+.login button {
+    margin-bottom: 10px; /* Space between the inputs and button */
+    padding: 10px;
+    font-size: 16px;
+}
+
+.password-container {
+    display: flex;
+    align-items: center;
+}
+
+#password-input {
+    flex: 1;
+}
+
+#toggle-password {
+    margin-left: 10px;
+    padding: 10px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+#login-btn {
+    cursor: pointer;
+}
+
+.signup {
+  display: flex;
+  flex-direction: column;
+  width: 300px; /* Adjust width as needed */
+  margin: 0 auto; /* Center the form horizontally */
+}
+
+.signup input,
+.signup button {
+  margin-bottom: 10px; /* Space between the inputs and button */
+  padding: 10px;
+  font-size: 16px;
+}
+
+.password-container {
+  display: flex;
+  align-items: center;
+}
+
+#password-input,
+#password-input2 {
+  flex: 1;
+}
+
+#toggle-password,
+#toggle-password2 {
+  margin-left: 10px;
+  padding: 10px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+#signUp-btn {
+  cursor: pointer;
+}
