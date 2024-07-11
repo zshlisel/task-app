@@ -13,7 +13,7 @@ async function loginBtnClicked() {
     password: password
   };
 
-  const response = await fetch('http://localhost:3000/login', {
+  const response = await fetch('http://localhost:3000/auth/login', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
@@ -63,7 +63,7 @@ async function signUpBtnClicked() {
   };
 
   // Send the new user to the server
-  const response = await fetch('http://localhost:3000/user', {
+  const response = await fetch('http://localhost:3000/auth/user', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
@@ -74,17 +74,17 @@ async function signUpBtnClicked() {
   if (response.ok) {
     let result = await response.json();
 
+
     let doneRegistering = setTimeout(displayApp, 3000);
     let signInBtn = document.querySelector('#signUp-btn');
     setTimeout(() => {
+      sessionStorage.setItem('userId', result.userId);
+      sampleTask()
       signInBtn.innerText = 'Logging in...';
       console.log('Successfully Signed Up');
-      sessionStorage.setItem('userId', result.userId);
       doneRegistering
     }, 1500);
     signInBtn.innerText = 'Registering...';
-
-    console.error('Login failed');
 
 
   } else {
@@ -97,7 +97,7 @@ function displayApp() {
   let container = document.querySelector(".todo-container");
   container.style.display = "block";
 
-  let welcomeCtr = document.querySelector(".getUser");
+  let welcomeCtr = document.querySelector(".auth-container");
   welcomeCtr.style.display = "none";
 
   displayTitle();
@@ -134,6 +134,32 @@ function togglePassword() {
   }
 }
 
+function newTogglePassword() {
+  const passwordInput = document.getElementById('new-password-input');
+  const toggleButton = document.getElementById('new-toggle-password');
+
+  if (passwordInput.type === 'password') {
+    passwordInput.type = 'text';
+    toggleButton.textContent = 'Hide';
+  } else {
+    passwordInput.type = 'password';
+    toggleButton.textContent = 'Show';
+  }
+}
+
+function newTogglePassword2() {
+  const passwordInput = document.getElementById('new-password-input2');
+  const toggleButton = document.getElementById('new-toggle-password2');
+
+  if (passwordInput.type === 'password') {
+    passwordInput.type = 'text';
+    toggleButton.textContent = 'Hide';
+  } else {
+    passwordInput.type = 'password';
+    toggleButton.textContent = 'Show';
+  }
+}
+
 function switchToSignUp() {
   let signUp = document.querySelector(".signup");
   signUp.style.display = "block";
@@ -149,3 +175,18 @@ function switchToLogin() {
   let signUp = document.querySelector(".signup");
   signUp.style.display = "none";
 }
+
+async function sampleTask(){
+const userId = sessionStorage.getItem('userId')
+  const response = await fetch('http://localhost:3000/tasks', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'authorization': userId
+    },
+    body: JSON.stringify({
+      title: 'This is a sample task.',
+      done: false
+    })
+  })
+};

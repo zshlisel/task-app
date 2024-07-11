@@ -89,8 +89,12 @@ async function taskCompleted(btnComleteElement) {
       'authorization': userId
     }
   })
+  if (response.ok){
   tasks.find((task) => Number(task.id).toString() === id).done = true;
   displayTasks();
+  } else {
+    console.log(response.error)
+  }
 }
 
 
@@ -142,3 +146,34 @@ function buildTaskElement(task) {
 
   return taskElement;
 }
+
+
+
+async function changeUsersName() {
+  const inputElement =o ;
+  const newName =0 ;
+
+  const userId = sessionStorage.getItem('userId')
+  const response = await fetch('http://localhost:3000/users/name', {
+    method: 'Patch',
+    headers: {
+      'Content-Type': 'application/json',
+      'authorization': userId
+    },
+    body: JSON.stringify(newName)
+  });
+
+  if (response.ok) {
+    let result = await response.json();
+    console.log(`name updated to ${result}`);
+    
+
+
+    inputElement.value = null;
+    //display the task in the document
+    displayTasks();
+  } else {
+    console.error('failed to add task');
+  }
+}
+

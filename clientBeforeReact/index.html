@@ -10,7 +10,7 @@
     <script src="./remove.js"></script>
   </head>
   <body>
-    <div class="getUser">
+    <div class="auth-container">
       <div class="login">
         <input id="user-name-input" type="text" placeholder="Please Enter Your user name" />
         <div class="password-container">
@@ -26,11 +26,11 @@
         <input id="email-input" type="email" placeholder="Please Enter Your email" />
         <div class="password-container">
           <input id="new-password-input" type="password" placeholder="Please Enter Your Password" />
-          <button id="toggle-password" type="button" onclick="togglePassword()">Show</button>
+          <button id="new-toggle-password" type="button" onclick="newTogglePassword()">Show</button>
         </div>
         <div class="password-container">
           <input id="new-password-input2" type="password" placeholder="Please Re-Enter Your Password" />
-          <button id="toggle-password" type="button" onclick="togglePassword()">Show</button>
+          <button id="new-toggle-password2" type="button" onclick="newTogglePassword2()">Show</button>
         </div>
         <button id="signUp-btn" onclick="signUpBtnClicked()">Register</button>
         <button id="to-login" onclick="switchToLogin()">Have An Account? Login Here!</button>
