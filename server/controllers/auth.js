@@ -15,7 +15,7 @@ async function encryptPassword(pass) {
     }
 }
 
-async function verifyPassword(password, hashedPassword) {
+export async function verifyPassword(password, hashedPassword) {
     try {
       const match = await bcrypt.compare(password, hashedPassword);
       if (match){
@@ -32,36 +32,6 @@ async function verifyPassword(password, hashedPassword) {
 
 
 
-
-/**
- * Authenticates a user based on their username and password.
- * 
- * @param {string} username - The username of the user trying to log in.
- * @param {string} password - The password of the user trying to log in.
- * @returns {Promise<{ok: boolean, userId?: number}>} A promise that resolves to an object indicating the authentication result. If successful, it includes the user's ID.
- */
-export async function login(username, password) {
-    if (typeof username ==='string'){
-        console.log('s')
-    }else{
-        console.log('el')
-    }
-    try {
-        const user = await db.oneOrNone('SELECT * FROM person WHERE name = ${username}', { username });
-        console.log('user', user)
-        if (user) {
-            const verify = await verifyPassword(password, user.pass)
-            if (verify) {
-                return { ok: true, userId: user.id };
-            }
-        }
-        
-        return { ok: false };
-    } catch (e) {
-        console.error(e);
-        throw e;
-    }
-}
 
 
 /**

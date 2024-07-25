@@ -1,0 +1,26 @@
+import { useNavigate } from "react-router-dom";
+import AuthContext from "./auth";
+import { useContext } from "react";
+
+export default function LogOutButton(){
+    const navigate = useNavigate();
+    const {setCurrentUser} = useContext(AuthContext);
+
+    const LogOutButtonClicked = async() =>{
+        let response = await fetch('http://localhost:3000/auth/logout', {
+            method: 'POST',
+            credentials: 'include', // This is important to include cookies in the request
+        });
+        if (response.ok) {
+            console.log('Logged out successfully');
+            setCurrentUser(null);
+            navigate('/')
+            // Perform any additional cleanup or redirection here
+        } else {
+            console.error('Logout failed');
+        }
+    }
+    return(
+        <button id = "logOut" className="logOut" onClick={LogOutButtonClicked}>Log Out</button>
+    )
+}

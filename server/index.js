@@ -1,5 +1,6 @@
 import express from "express";
 import cors from "cors";
+import cookieParser from "cookie-parser";
 import taskRoute from './routes/tasks.js';
 import authRoute from './routes/auth.js';
 import rootRoute from './routes/root.js';
@@ -12,8 +13,12 @@ import userRoute from './routes/users.js';
 
 const app = express()
 
-app.use(cors())
+app.use(cors({
+    origin: 'http://localhost:5173',
+    credentials: true,
+  }));
 app.use(express.json())
+app.use(cookieParser('mySecret'))
 const port = 3000;
 
 app.use((req, res, next) => {

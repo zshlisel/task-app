@@ -1,16 +1,17 @@
 import db from "../controllers/db.js";
 import { createTask, getTasks, markAsComplete, deleteTask } from "../controllers/tasks.js";
+import passport from "passport"
 import {Router} from "express";
 const router = Router();
 
-let tasks = [];
+router.use(passport.authenticate('cookie', {
+    session: false
+  }))
+
+
 
 router.get('/', async (req, res) => {
-    const userId = req.headers['authorization']
-    if (!userId){
-        return res.status(401).json({error: 'Unauthorized'});
-    }
-    res.json(await getTasks(userId))
+    res.json(await getTasks(req.user.id))
     if (res.json.length === 0){
         return res.status(200).json([]);
     }
@@ -20,31 +21,19 @@ router.get('/', async (req, res) => {
 
 // post new task
 router.post('/', async (req, res) => {
-    const userId = req.headers['authorization']
-    if (!userId) {
-        return res.status(401).json({ error: 'Unauthorized' });
-    }
-    res.json(await createTask(req.body.title, userId));
+    res.json(await createTask(req.body.title, req.user.id));
  })
 
 
 // update completed task
 router.patch('/:id', async (req, res) => {
-    const userId = req.headers['authorization']
-    if (!userId){
-        return res.status(401).json({error: 'Unauthorized'});
-    }
-    res.json(await markAsComplete(req.params.id, userId))    
+    res.json(await markAsComplete(req.params.id, req.user.id))    
 })
 
 
 // mark task as deleted
 router.delete('/:id', async (req, res) => {
-    const userId = req.headers['authorization']
-    if (!userId){
-        return res.status(401).json({error: 'Unauthorized'});
-    }
-    res.json(await deleteTask(userId, req.params.id))
+    res.json(await deleteTask(req.user.id, req.params.id))
 })
 
 

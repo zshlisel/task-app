@@ -109,7 +109,7 @@ function buildTaskElement(task) {
   taskElement.setAttribute('data-task-id', task.id);
 
 
-  taskElement.innerHTML = `<p>${task.title}</p><p>${task.userName}</p>
+  taskElement.innerHTML = `<p>${task.title}</p>
     <div>
     ${task.done ? "" :
       `<button onclick="taskCompleted(this)">
