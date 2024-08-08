@@ -51,6 +51,7 @@ router.post('/login',
         const { id, name } = req.user;
         const payload = { id, name };
 
+
         const token = jwt.sign(payload, 'mySecret');
         return res
             .cookie("token", token, {
@@ -75,15 +76,34 @@ router.post('/login',
 
 router.post('/user', async (req, res) => {
     try {
-        await createUser(
+        const user = await createUser(
             req.body.name,
             req.body.pass,
             req.body.email
         );
-        res.
+        if (user) {
+        const { id, name } = user;
+        const payload = { id, name };
+
+        const token = jwt.sign(payload, 'mySecret');
         
-        
-        json({ ok: true, message: 'User Created Successfully' });
+
+        res
+        .cookie("token", token, {
+            // can only be accessed by server requests
+            httpOnly: true,
+            // path = where the cookie is valid
+            path: "/",
+            // domain = what domain the cookie is valid on
+            domain: ".localhost",
+            // secure = only send cookie over https
+            secure: false,
+            // sameSite = only send cookie if the request is coming from the same origin
+            sameSite: "lax", // "strict" | "lax" | "none" (secure must be true)
+            // maxAge = how long the cookie is valid for in milliseconds
+            maxAge: 3600000, // 1 hour
+        })
+        .json({ ok: true, message: 'User Created Successfully' })};
     } catch (error) {
         console.error(error);
         res.status(500).json({ ok: false, message: 'User creation failed' });
@@ -111,6 +131,5 @@ router.get('/check-auth', passport.authenticate('cookie', { session: false }), (
         res.status(401).json({ error: 'Unauthorized' });
     }
 });
-
 
 export default router;

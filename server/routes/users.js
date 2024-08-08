@@ -1,6 +1,11 @@
 import { Router } from "express";
 import { updateUserName } from "../controllers/users.js";
+import multer from 'multer'
 const router = Router();
+
+const upload = multer({
+    dest: './uploads'
+})
 
 router.patch('/name', async (req, res) => {
     try {
@@ -14,5 +19,12 @@ router.patch('/name', async (req, res) => {
     }
 })
 
+router.post('/upload-profile', upload.single('profile'), (req, res, next) => {
+    res.send({ 
+        success: true,
+        originalName: req.file.originalname,
+        url: `http://localhost:3000/images/${req.file.filename}`
+     })
+})
 
 export default router;

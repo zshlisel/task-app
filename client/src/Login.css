@@ -1,0 +1,17 @@
+ .login-form__username.invalid input,
+ .login-form__password.invalid input,
+ .login-form__email.invalid input{
+    border-color: red; 
+  }
+
+  .login-form p.err-msg {
+    color: red;
+  }
+
+  .login-form__username,
+  .login-form__password,
+  .login-form__email {
+     text-align: right;
+   }
+
+  

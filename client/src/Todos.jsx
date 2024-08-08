@@ -3,6 +3,7 @@ import Task from "./Task";
 import { useNavigate } from "react-router-dom";
 import NewTask from "./NewTask";
 import LogOutButton from "./LogOut";
+import Profile from "./Profile";
 
 
 export default function Todos() {
@@ -34,6 +35,7 @@ export default function Todos() {
     return (
         <div className="todo-container">
             <LogOutButton/>
+            <Profile/>
             <h1 id="app-title">Your Tasks</h1>
             <NewTask UpdateTasks={loadTasks} />
 

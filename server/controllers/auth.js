@@ -54,6 +54,6 @@ export async function createUser(name, pass, email) {
     return {
         name: result.name,
         email: result.email,
-        userId: result.id
+        id: result.id
     };
 }

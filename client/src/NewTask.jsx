@@ -1,9 +1,7 @@
-import { useContext, useRef } from "react";
-import AuthContext from "./auth"
+import {  useRef } from "react";
 
 export default function NewTask({UpdateTasks}) {
     const NewTaskRef = useRef()
-    const userId = useContext(AuthContext)
     async function handleSubmit() {
 
         let newTaskObject = {
@@ -17,7 +15,6 @@ export default function NewTask({UpdateTasks}) {
              credentials: "include",
             headers: {
                 'Content-Type': 'application/json',
-                'authorization': userId
             },
             body: JSON.stringify(newTaskObject)
         });

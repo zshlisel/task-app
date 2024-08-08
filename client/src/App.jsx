@@ -1,31 +1,30 @@
-import { useState } from "react"
 import { createBrowserRouter, RouterProvider } from "react-router-dom"
 import Todos from './Todos.jsx'
-import AuthContext from './auth.js'
 import Login from './Login.jsx'
 import './App.css'
+import SignUp from "./Sign-up.jsx"
 
 
 
 export default function App() {
-    const [currentUser, setCurrentUser] = useState(null)
-  
-  
+ 
     const router = createBrowserRouter([
       {
         path: '/',
-        element: <Login setCurrentUser={setCurrentUser} />
+        element: <Login/>
       },
       {
         path: '/tasks',
         element: <Todos/>
 
+      },
+      {
+        path: '/sign-up',
+        element: <SignUp/>
       }
     ])
   
     return (
-      <AuthContext.Provider value={{currentUser, setCurrentUser}}>
         <RouterProvider router={router} />
-      </AuthContext.Provider>
     )
   }

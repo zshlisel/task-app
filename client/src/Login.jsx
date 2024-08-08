@@ -1,12 +1,11 @@
 import React from "react"
 import { useNavigate } from "react-router-dom";
 
-export default function Login({ setCurrentUser }) {
+export default function Login() {
     const navigate = useNavigate()
     const userRef = React.useRef();
     const passRef = React.useRef();
     const loginRef = React.useRef();
-    const signUpRef = React.useRef();
 
     async function handleSubmit(event) {
         event.preventDefault()
@@ -31,7 +30,6 @@ export default function Login({ setCurrentUser }) {
             const result = await response.json();
             if (result.ok) {
                 console.log('Login successful');
-                setCurrentUser(result.id);
                 navigate("/tasks");
 
             } else {
@@ -47,49 +45,19 @@ export default function Login({ setCurrentUser }) {
 
 
 
-    async function handleSignUp(event) {
-        event.preventDefault()
-        signUpRef.current.textContent = 'Signing Up...'
-
-        let newUserObject = {
-            name: 'exampleName',
-            pass: passRef.current.value,
-            email: userRef.current.value
-        };
-
-        const response = await fetch('http://localhost:3000/auth/user', {
-            method: 'POST',
-            mode: "cors",
-            credentials: "include",
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(newUserObject)
-        });
-
-        if (response.ok) {
-            let result = await response.json();
-            setCurrentUser(result.id);
-            console.log('Successfully Signed Up');
-            navigate("/tasks");
-        } else {
-            console.error('failed to add user');
-            signUpRef.current.textContent = 'Sign Up'
-        }
-
-    }
-
+   
 
     return (
         <>
             <form onSubmit={handleSubmit}>
                 <label htmlFor="username" >Username</label>
                 <input type="text" id="username" name="username" ref={userRef} />
+                <br/>
                 <label htmlFor="password">Password</label>
                 <input type="password" id="password" name="password" ref={passRef} />
-                <br />
+                <br/>
                 <button type="submit" ref={loginRef}>Login</button>
-                <button onClick={handleSignUp} ref={signUpRef}>Sign Up</button>
+                <a href="./sign-up" >Sign Up</a>
             </form>
         </>
     )
