@@ -17,3 +17,12 @@ export const updateUserName = async (userId, newName) => {
         console.error('error updating name', e)
     }
 }
+
+export const uploadPhoto = async (url, userId) => {
+    try {
+        const result = await db.none('update person set photo_url = ${url} where id = ${userId}',{url, userId})
+        return {ok: true}
+    } catch (e) {
+        console.error('error uploading profile photo', e)
+    }
+}

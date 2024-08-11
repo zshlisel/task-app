@@ -2,15 +2,31 @@ import { useState, useCallback } from "react";
 import { useDropzone } from 'react-dropzone'
 import './App.css'
 
+function fileSizeValidator(file) {
+    if (file.size > 2000000) {
+        return {
+            code: "file-too-large",
+            message: `File is larger than 2MB`
+        }
+    }
+    return null
+}
+
 export default function ProfilePhoto({ setUserProfilePic }) {
     const [file, setFile] = useState(null);
-    const [url, setUrl] = useState();
+    const [errMessage, setErrMessage] = useState();
     const [previewDataUrl, setPreviewDataUrl] = useState();
 
-    const onDrop =((acceptedFiles) => {
-        let file = acceptedFiles.files[0];
+    const onDrop = useCallback((files, rejectedFiles) => {
+        let file = files[0];
+
+        if (rejectedFiles.length > 0) {
+            setErrMessage(rejectedFiles[0].errors[0].message);
+            return;
+        }
 
         setFile(file);
+        setErrMessage('');
 
         let fileReader = new FileReader();
 
@@ -24,7 +40,14 @@ export default function ProfilePhoto({ setUserProfilePic }) {
     },[])
 
 
-    const { getRootProps, getInputProps, isDragActive } = useDropzone({onDrop})
+    const { getRootProps, getInputProps, isDragActive } = useDropzone({
+        validator: fileSizeValidator,
+        accept: {
+            'image/jpeg': ['.jpeg'],
+            'image/png': ['.png']
+          },
+          onDrop
+    })
 
 
 
@@ -49,20 +72,23 @@ export default function ProfilePhoto({ setUserProfilePic }) {
 
     return (
         <>
-            <section className="profile-photo" onClick={stopPropagation}>
+            <section className="profile-photo">
                 <label htmlFor="">Profile Picture</label>
-                <div {...getRootProps()} >
+                <div {...getRootProps()} className={"dropBox "+ (isDragActive ? "dragging" : null)}>
                     <input {...getInputProps()} />
                     {
                         isDragActive ?
                             <p>Drop the files here ...</p> :
                             <p>Drag 'n' drop some files here, or click to select files</p>
                     }
+                    <em>(Only *.jpeg and *.png images will be accepted, 
+                        File size max 2MB)</em>
                 </div>
+                {errMessage && <p>{errMessage}</p>}
                 <div>
-                    {previewDataUrl ? <img src={previewDataUrl} width='200' height='200' /> : null}
+                    {previewDataUrl ? <img src={previewDataUrl} className="preview" /> : null}
                 </div>
-                {file ? <button onClick={uploadFile}>Upload</button> : null}
+                {file && !errMessage ? <button onClick={uploadFile}>Upload</button> : null}
             </section>
 
         </>
